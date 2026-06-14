@@ -5,46 +5,56 @@
 ![Digital Design](https://img.shields.io/badge/Digital%20Design-e36209?style=flat-square)
 ![RTL](https://img.shields.io/badge/RTL%20Simulation-0075ca?style=flat-square)
 ![CDC](https://img.shields.io/badge/CDC%20Design-0075ca?style=flat-square)
+![Gray Code](https://img.shields.io/badge/Gray%20Code-e36209?style=flat-square)
 
 ---
 
 ## 📌 Project Overview
 
-This project implements an **Asynchronous FIFO (First In First Out)** buffer in Verilog HDL. An Async FIFO is used to safely transfer data between two clock domains operating at different frequencies — a critical concept in modern SoC and VLSI design. The design uses **Gray code pointers** to handle Clock Domain Crossing (CDC) and avoid metastability issues.
+This project implements a fully functional **Asynchronous FIFO** in Verilog HDL with parameterized **Data Width (DSIZE=8)** and **Address Size (ASIZE=4)**, giving a FIFO depth of **16 locations**. It safely transfers data between two independent clock domains using **Gray code pointer synchronization** to prevent metastability — a key technique used in modern SoC and VLSI design.
+
+---
+
+## 🗂 Module Architecture
+
+| Module | Description |
+|--------|-------------|
+| `FIFO.v` | Top-level module — instantiates all submodules |
+| `FIFO_memory.v` | Dual-port RAM memory array |
+| `wptr_full.v` | Write pointer + FIFO full flag logic (Gray code) |
+| `rptr_empty.v` | Read pointer + FIFO empty flag logic (Gray code) |
+| `sync_w2r.v` | Write→Read clock domain pointer synchronizer (2-FF) |
+| `sync_r2w.v` | Read→Write clock domain pointer synchronizer (2-FF) |
+| `FIFO_tb.v` | Testbench — verifies all functional scenarios |
+
+---
+
+## 🔌 Top-Level Port Description
+
+| Port | Direction | Width | Description |
+|------|-----------|-------|-------------|
+| wclk | Input | 1-bit | Write clock domain |
+| rclk | Input | 1-bit | Read clock domain |
+| wrst_n | Input | 1-bit | Active-low write reset |
+| rrst_n | Input | 1-bit | Active-low read reset |
+| winc | Input | 1-bit | Write increment (enable) |
+| rinc | Input | 1-bit | Read increment (enable) |
+| wdata | Input | DSIZE | Write data input |
+| rdata | Output | DSIZE | Read data output |
+| wfull | Output | 1-bit | FIFO full flag |
+| rempty | Output | 1-bit | FIFO empty flag |
 
 ---
 
 ## ✨ Features
 
-- ✅ Dual clock domain support (write clock & read clock)
-- ✅ Gray code pointer synchronization for CDC
-- ✅ Full & Empty flag generation
-- ✅ Parameterized data width and FIFO depth
-- ✅ Verified using single testbench in Vivado Simulator
-
----
-
-## 🔌 Port Description
-
-| Port | Direction | Description |
-|------|-----------|-------------|
-| wr_clk | Input | Write clock domain |
-| rd_clk | Input | Read clock domain |
-| wr_en | Input | Write enable signal |
-| rd_en | Input | Read enable signal |
-| din | Input | Data input |
-| dout | Output | Data output |
-| full | Output | FIFO full flag |
-| empty | Output | FIFO empty flag |
-
----
-
-## 🛠 Tools Used
-
-| Tool | Purpose |
-|------|---------|
-| Xilinx Vivado | Design, Synthesis & Simulation |
-| Verilog HDL | Hardware Description Language |
+- ✅ Parameterized: DSIZE=8 bits, ASIZE=4 → depth of 16 locations
+- ✅ Dual independent clock domains (wclk & rclk)
+- ✅ Gray code pointers for safe Clock Domain Crossing (CDC)
+- ✅ 2-FF synchronizers for metastability prevention
+- ✅ Active-low asynchronous reset for both clock domains
+- ✅ wfull & rempty status flags
+- ✅ Verified with testbench in Xilinx Vivado
 
 ---
 
@@ -52,9 +62,14 @@ This project implements an **Asynchronous FIFO (First In First Out)** buffer in 
 
 ```
 async-fifo/
-├── async_fifo.v        ← Main FIFO module
-├── tb_async_fifo.v     ← Testbench
-├── waveform.png        ← Simulation waveform screenshot
+├── FIFO.v            ← Top-level module
+├── FIFO_memory.v     ← Dual-port RAM
+├── wptr_full.v       ← Write pointer & full flag
+├── rptr_empty.v      ← Read pointer & empty flag
+├── sync_w2r.v        ← Write-to-Read synchronizer
+├── sync_r2w.v        ← Read-to-Write synchronizer
+├── FIFO_tb.v         ← Testbench
+├── waveform.png      ← Simulation waveform
 └── README.md
 ```
 
@@ -64,16 +79,17 @@ async-fifo/
 
 ![Waveform](waveform.png)
 
-> Waveform showing write/read operations, full & empty flag behaviour simulated in Xilinx Vivado.
+> Waveform shows wclk, rclk, winc, rinc, wdata, rdata, wfull and rempty signals verified in Xilinx Vivado Simulator.
 
 ---
 
 ## 🎓 Learning Outcome
 
-- Understood Clock Domain Crossing (CDC) in digital design
-- Learned Gray code pointer synchronization technique
-- Verified FIFO full/empty flag logic through simulation
-- Gained practical experience with dual clock domain designs
+- Mastered Clock Domain Crossing (CDC) in digital design
+- Implemented Gray code pointer technique to avoid metastability
+- Designed 2-FF synchronizers for safe signal transfer between domains
+- Built parameterized dual-port memory for FIFO storage
+- Verified full/empty flag logic through comprehensive simulation
 
 ---
 
